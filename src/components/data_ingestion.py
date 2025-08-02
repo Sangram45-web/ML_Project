@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from src.components.data_transformation import DataTransformation
 from src.components.data_transformation import DataTransformationConfig
 from src.utils import save_object
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
 
 @dataclass
 class DataIngestionConfig:
@@ -42,11 +44,15 @@ class DataIngestion:
 
         except Exception as e:
             logging.error(f"Error occurred during data ingestion: {e}")
-            raise CustomException.DataIngestionException(e, sys) from e
+            raise CustomException(e, sys)
 
 if __name__ == "__main__":
     data_ingestion = DataIngestion()
     train_data, test_data = data_ingestion.initiate_data_ingestion()
 
     data_transformation = DataTransformation()
-    data_transformation.initiate_data_transformation(train_data, test_data)
+    train_arr,test_arr,_ = data_transformation.initiate_data_transformation(train_data, test_data)
+
+    model_trainer = ModelTrainer()
+    r2_square = model_trainer.initiate_model_trainer(train_arr, test_arr)
+    print(f"R2 Score of the best model: {r2_square}")
